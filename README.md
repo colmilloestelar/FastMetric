@@ -169,7 +169,7 @@ That is why FastMetric is designed for an owner. One admin, or more who is in ch
 - gets the shared token and gives it to the machines
 - sets the alert thresholds once
 - configures SMTP email and webhooks once
-- turns the alert sound on or off for the whole team
+- turns the alert notification on or off for the teams
 
 Everyone else just looks at the dashboard(page). They see the status, open the diagnostics)Skip and read the log, but they do not change the settings. This keeps the tool calm and predictable. Pick one person to be the admin and make sure only that person has the Settings credentials.
 

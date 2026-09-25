@@ -1,0 +1,61 @@
+services:
+
+  server:
+    build: .
+    container_name: fastmetric-server
+    ports:
+      - "8456:8456"
+    environment:
+      SERVER_PORT: "8456"
+      RETENTION_DAYS: "7"
+      TOKEN: "demo123"
+    volumes:
+      - fastmetric-data:/srv/fastmetric/data
+
+  sim-healthy:
+    build: ./agent
+    container_name: sim-healthy
+    depends_on:
+      - server
+    environment:
+      MS_SERVER_URL: "http://server:8456"
+      MS_TOKEN: "demo123"
+      MS_NAME: "apps-web"
+      MS_KIND: "vm"
+      MS_INTERVAL: "8"
+      MS_DISK_PCT: "42"
+      MS_CPU_PCT: "12"
+      MS_MEM_PCT: "38"
+
+  sim-disk-full:
+    build: ./agent
+    container_name: sim-disk-full
+    depends_on:
+      - server
+    environment:
+      MS_SERVER_URL: "http://server:8456"
+      MS_TOKEN: "demo123"
+      MS_NAME: "db-primary"
+      MS_KIND: "vm"
+      MS_INTERVAL: "8"
+      MS_DISK_PCT: "97"
+      MS_CPU_PCT: "20"
+      MS_MEM_PCT: "55"
+
+  sim-cpu-high:
+    build: ./agent
+    container_name: sim-cpu-high
+    depends_on:
+      - server
+    environment:
+      MS_SERVER_URL: "http://server:8456"
+      MS_TOKEN: "demo123"
+      MS_NAME: "worker-03"
+      MS_KIND: "container"
+      MS_INTERVAL: "8"
+      MS_DISK_PCT: "35"
+      MS_CPU_PCT: "95"
+      MS_MEM_PCT: "80"
+
+volumes:
+  fastmetric-data:

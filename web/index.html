@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FastMetric</title>
+<link rel="stylesheet" href="/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>📡</text></svg>">
+</head>
+<body>
+
+<header>
+  <div class="brand">📡 FastMetric</div>
+  <div class="header-actions">
+    <button id="bell" class="icon-btn" title="Toggle alert sound">🔔</button>
+    <button class="icon-btn" title="Refresh" onclick="app.refresh()">🔄</button>
+    <button class="icon-btn" title="Settings" onclick="app.openSettings()">⚙️</button>
+  </div>
+</header>
+
+<main>
+  <section id="dashboard" class="view"></section>
+
+  <div id="detail-view" class="view" style="display:none"></div>
+
+  <section id="log-view" class="view" style="display:none">
+    <div class="inline-controls">
+      <input id="log-search" type="search" placeholder="Filter by name or IP" oninput="app.renderLog()">
+      <select id="log-level" onchange="app.renderLog()">
+        <option value="">All levels</option>
+        <option value="info">Info</option>
+        <option value="warning">Warning</option>
+        <option value="critical">Critical</option>
+        <option value="ok">Recovered</option>
+      </select>
+      <button class="btn" onclick="app.renderLog()">Refresh</button>
+    </div>
+    <div id="log-list"></div>
+  </section>
+</main>
+
+<div id="tabbar">
+  <button class="tab active" data-tab="dashboard" onclick="app.showTab('dashboard')">Clients</button>
+  <button class="tab" data-tab="log" onclick="app.showTab('log')">Log</button>
+</div>
+
+<div id="settings-modal" class="modal" style="display:none">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2>Settings</h2>
+      <button class="icon-btn" onclick="app.closeSettings()">✕</button>
+    </div>
+    <div class="modal-body">
+      <h3>Notifications</h3>
+      <label class="row">
+        <span>Send email</span>
+        <input type="checkbox" id="set-email-enabled">
+      </label>
+      <div id="email-fields" class="fields">
+        <input id="set-email-to" placeholder="to@example.com">
+        <input id="set-email-smtp" placeholder="smtp.example.com:587">
+        <input id="set-email-user" placeholder="username">
+        <input id="set-email-password" type="password" placeholder="password">
+        <button class="btn" onclick="app.testEmail()">Send test email</button>
+      </div>
+      <h3>Webhooks</h3>
+      <p class="hint">One URL per line. Works with Teams, Discord, Slack and anything accepting a POST.</p>
+      <textarea id="set-webhooks" rows="3" placeholder="https://hooks.example.com/..."></textarea>
+      <button class="btn" onclick="app.testWebhooks()">Send test to all webhooks</button>
+
+      <h3>Thresholds</h3>
+      <p class="hint">A client turns <span class="dot warning" style="display:inline-block;vertical-align:middle"></span> warning when any metric crosses the warning value, and <span class="dot critical" style="display:inline-block;vertical-align:middle"></span> critical at the critical value. 0 disables the check.</p>
+      <div class="thr-row"><span>Disk</span><label>warn <input type="number" id="thr-disk-warning" min="0" max="100" value="90"></label><label>crit <input type="number" id="thr-disk-critical" min="0" max="100" value="98"></label></div>
+      <div class="thr-row"><span>CPU</span><label>warn <input type="number" id="thr-cpu-warning" min="0" max="100" value="90"></label><label>crit <input type="number" id="thr-cpu-critical" min="0" max="100" value="95"></label></div>
+      <div class="thr-row"><span>Memory</span><label>warn <input type="number" id="thr-mem-warning" min="0" max="100" value="90"></label><label>crit <input type="number" id="thr-mem-critical" min="0" max="100" value="95"></label></div>
+
+      <h3>Server</h3>
+      <label class="row">
+        <span>Agent token</span>
+        <span class="mono" id="set-token"></span>
+      </label>
+      <button class="btn" onclick="app.copyToken()">Copy token</button>
+      <label class="row">
+        <span>Report interval (seconds)</span>
+        <input type="number" id="set-interval" min="10" step="10" style="width:100px">
+      </label>
+      <p class="hint">How often agents send their data. Changes apply on their next report.</p>
+
+      <h3>Project alerts</h3>
+      <p class="hint">Projects from your clients, each with its own email and webhooks. Critical alerts are always copied to the global channels too.</p>
+      <div id="project-alerts-list"></div>
+
+      <div class="modal-foot">
+        <button class="btn primary" onclick="app.saveSettings()">Save</button>
+        <button class="btn" onclick="app.closeSettings()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="confirm-modal" class="modal" style="display:none">
+  <div class="modal-box small">
+    <div class="modal-head">
+      <h2>Remove client</h2>
+      <button class="icon-btn" onclick="app.closeConfirm()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p id="confirm-text"></p>
+      <input id="confirm-input" placeholder="Type the client name to confirm">
+      <div class="modal-foot">
+        <button class="btn danger" onclick="app.doDelete()">Remove</button>
+        <button class="btn" onclick="app.closeConfirm()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="admin-modal" class="modal" style="display:none">
+  <div class="modal-box small">
+    <div class="modal-head">
+      <h2>Admin required</h2>
+      <button class="icon-btn" onclick="app.closeAdmin()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="hint">Viewing is open to everyone, but this action needs admin permissions.</p>
+      <input id="admin-password" type="password" placeholder="Admin password">
+      <div class="modal-foot">
+        <button class="btn primary" onclick="app.submitAdmin()">Confirm</button>
+        <button class="btn" onclick="app.closeAdmin()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="project-modal" class="modal" style="display:none">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2 id="project-modal-title">Project alerts</h2>
+      <button class="icon-btn" onclick="app.closeProject()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="hint">
+        This project has its own destination for alerts. Critical alerts are <b>always</b> also sent to the global
+        channels (Settings → Email / Webhooks). Clients without a project use only the global channels.
+      </p>
+      <label class="row">
+        <span>Alert email</span>
+        <input id="project-email" placeholder="sre-team@example.com">
+      </label>
+      <label class="row">
+        <span>Webhooks</span>
+      </label>
+      <textarea id="project-webhooks" rows="3" placeholder="https://hooks.example.com/... (one per line)"></textarea>
+      <div class="modal-foot">
+        <button class="btn" onclick="app.testProject()">Send test</button>
+        <button class="btn primary" onclick="app.saveProjectAlerts()">Save</button>
+        <button class="btn" onclick="app.closeProject()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>

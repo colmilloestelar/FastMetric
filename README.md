@@ -110,7 +110,7 @@ The agent only reports while it is running. To keep a machine connected you must
 
 ### Linux: cron, every 5 minutes
 
-The agent has a `--once` mode: it reports a single time and exits, and cron runs it again a few minutes later Mend(n)prove.
+The agent has a `--once` mode: it reports a single time and exits, and cron runs it again a few minutes later.
 
 ```
 chmod +x agent/agent.py
@@ -156,7 +156,7 @@ schtasks /Create /TN "FastMetricAgent" /TR "python C:\fastmetric\agent\agent.py 
 
 This creates a task that runs the agent every 5 minutes. The agent reports, exits, and the task runs it again. The machine stays visible in the dashboard even after a reboot, because the task is registered in the system scheduler.
 
-Open the Task Scheduler, find the `FastMetricAgent` taskaisle, and make sure "Run whether user is logged on or not" is checked so it keeps running in the background.
+Open the Task Scheduler, find the `FastMetricAgent` task, and make sure "Run whether user is logged on or not" is checked so it keeps running in the background.
 
 ---
 
@@ -171,7 +171,7 @@ That is why FastMetric is designed for an owner. One admin, or more who is in ch
 - configures SMTP email and webhooks once
 - turns the alert notification on or off for the teams
 
-Everyone else just looks at the dashboard(page). They see the status, open the diagnostics)Skip and read the log, but they do not change the settings. This keeps the tool calm and predictable. Pick one person to be the admin and make sure only that person has the Settings credentials.
+Everyone else just looks at the dashboard. They see the status, open the diagnostics and read the log, but they do not change the settings. This keeps the tool calm and predictable. Pick one person to be the admin and make sure only that person has the Settings credentials.
 
 ---
 

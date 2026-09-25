@@ -160,18 +160,18 @@ Open the Task Scheduler, find the `FastMetricAgent` taskaisle, and make sure "Ru
 
 ---
 
-## Settings are owned by one admin
+## Settings are owned by admin
 
 FastMetric has settings that change how the whole tool behaves: the shared agent token, alert thresholds, alert sound, SMTP email, webhooks and the report interval. If every person changes these on their own, the tool becomes chaos. Tokens stop matching, alerts go to the wrong places, thresholds start conflicting.
 
-That is why FastMetric is designed for a single owner. One admin, or one person who is in charge, manages all the settings from the Settings screen. That person:
+That is why FastMetric is designed for an owner. One admin, or more who is in charge, manages all the settings from the Settings screen. That person:
 
 - gets the shared token and gives it to the machines
 - sets the alert thresholds once
 - configures SMTP email and webhooks once
 - turns the alert sound on or off for the whole team
 
-Everyone else just looks at the dashboard情緒(page). They see the status, open the diagnostics)Skip and read the log, but they do not change the settings. This keeps the tool calm and predictable. Pick one person to be the admin and make sure only that person has the Settings credentials.
+Everyone else just looks at the dashboard(page). They see the status, open the diagnostics)Skip and read the log, but they do not change the settings. This keeps the tool calm and predictable. Pick one person to be the admin and make sure only that person has the Settings credentials.
 
 ---
 
